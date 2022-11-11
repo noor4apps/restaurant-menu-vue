@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import { useAlertStore } from '@/stores';
 import { HomeView } from '@/views';
+import itemsRoutes from './items.routes';
+
 
 
 export const router = createRouter({
@@ -9,6 +11,7 @@ export const router = createRouter({
     linkActiveClass: 'active',
     routes: [
         { path: '/', component: HomeView },
+        { ...itemsRoutes },
         // catch all redirect to home page
         { path: '/:pathMatch(.*)*', redirect: '/' }
     ]
