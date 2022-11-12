@@ -28,7 +28,7 @@ async function onDelete(item_id) {
         <thead>
             <tr>
                 <th style="width: 30%">Name</th>
-                <th style="width: 30%">discount</th>
+                <th style="width: 30%">Discount</th>
                 <th style="width: 30%">Price</th>
                 <th style="width: 30%">Menu</th>
                 <th style="width: 10%"></th>
@@ -38,7 +38,8 @@ async function onDelete(item_id) {
             <template v-if="items.length">
                 <tr v-for="item in items" :key="item.id">
                     <td>{{ item.name }}</td>
-                    <td>{{ item.discount }}</td>
+                    <td v-if="item.discount">{{ item.discount }}</td>
+                    <td v-else> No Discount </td>
                     <td>{{ item.price }}</td>
                     <td>{{ item.menu.name }}</td>
                     <td style="white-space: nowrap">
