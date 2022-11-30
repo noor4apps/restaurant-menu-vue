@@ -32,21 +32,30 @@ const schema = Yup.object().shape({
 
 itemsStore.create();
 
-async function onSubmit(values) {
-    try {
-        let message;
-        if (item) {
-            const res = await itemsStore.update(item.value.id, values)
-            message = res.data.message;
-        } else {
-            const res = await itemsStore.add(values);
-            message = res.data.message;
-        }
-        await router.push('/items');
-        alertStore.success(message);
-    } catch (error) {
-        alertStore.error(error);
-    }
+async function onSubmit(values, {setErrors}) {
+  if (item) {
+    await itemsStore.update(item.value.id, values).then(async (res) => {
+      await router.push('/items');
+      alertStore.success(res.data.message);
+    }).catch((err) => {
+      if (err.response.data.errors) {
+        setErrors(err.response.data.errors);
+      } else {
+        alertStore.error(err.response.data.message);
+      }
+    });
+  } else {
+    itemsStore.add(values).then(async (res) => {
+      await router.push('/items');
+      alertStore.success(res.data.message);
+    }).catch((err) => {
+      if (err.response.data.errors) {
+        setErrors(err.response.data.errors);
+      } else {
+        alertStore.error(err.response.data.message);
+      }
+    });
+  }
 }
 </script>
 
@@ -97,7 +106,7 @@ async function onSubmit(values) {
     </template>
     <template v-if="item?.error">
         <div class="text-center m-5">
-            <div class="text-danger">Error loading item: {{item.error}}</div>
+            <div class="text-danger">Error loading item: {{item.error.response.data.message}}</div>
         </div>
     </template>
 </template>

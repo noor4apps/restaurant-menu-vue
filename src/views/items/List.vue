@@ -10,14 +10,15 @@ const { items } = storeToRefs(itemsStore);
 itemsStore.getAll();
 
 async function onDelete(item_id) {
-  try {
-    let message;
-    const res = await itemsStore.delete(item_id);
-    message = res.data.message;
-    alertStore.success(message);
-  } catch (error) {
-    alertStore.error(error);
-  }
+  await itemsStore.delete(item_id).then((res) => {
+    // remove item from list after deleted
+    this.items = this.items.filter(x => x.id !== item_id);
+    alertStore.success(res.data.message);
+  }).catch((err) => {
+    // remove isDeletes if the deletion fails
+    this.items.find(x => x.id === item_id).isDeleting = false;
+    alertStore.error(err.response.data.message);
+  });
 }
 </script>
 
@@ -58,7 +59,7 @@ async function onDelete(item_id) {
             </tr>
             <tr v-if="items.error">
                 <td colspan="4">
-                    <div class="text-danger">Error loading items: {{items.error}}</div>
+                    <div class="text-danger">Error loading items: {{items.error.response.data.message}}</div>
                 </td>
             </tr>            
         </tbody>

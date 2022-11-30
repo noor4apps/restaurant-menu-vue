@@ -44,18 +44,10 @@ export const useItemsStore = defineStore({
             return await axios.put(`${baseUrl}/${id}`, params);
         },
         async delete(id) {
-            return await axios.delete(`${baseUrl}/${id}`).then((response) => {
+            // add isDeleting prop to item being deleted
+            this.items.find(x => x.id === id).isDeleting = true;
 
-                // add isDeleting prop to item being deleted
-                this.items.find(x => x.id === id).isDeleting = true;
-
-                // remove item from list after deleted
-                this.items = this.items.filter(x => x.id !== id);
-
-                return response;
-            }, (error) => {
-                console.log(error);
-            });
+            return await axios.delete(`${baseUrl}/${id}`);
         }
     }
 });
