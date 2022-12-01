@@ -44,18 +44,10 @@ export const useMenusStore = defineStore({
             return await axios.put(`${baseUrl}/${id}`, params);
         },
         async delete(id) {
-            return await axios.delete(`${baseUrl}/${id}`).then((response) => {
+            // add isDeleting prop to menu being deleted
+            this.menus.find(x => x.id === id).isDeleting = true;
 
-                // add isDeleting prop to menu being deleted
-                this.menus.find(x => x.id === id).isDeleting = true;
-
-                // remove menu from list after deleted
-                this.menus = this.menus.filter(x => x.id !== id);
-
-                return response;
-            }, (error) => {
-                console.log(error);
-            });
+            return await axios.delete(`${baseUrl}/${id}`)
         }
     }
 });

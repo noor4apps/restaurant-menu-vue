@@ -10,14 +10,15 @@ const { menus } = storeToRefs(menusStore);
 menusStore.getAll();
 
 async function onDelete(menu_id) {
-  try {
-    let message;
-    const res = await menusStore.delete(menu_id);
-    message = res.data.message;
-    alertStore.success(message);
-  } catch (error) {
-    alertStore.error(error);
-  }
+  await menusStore.delete(menu_id).then((res) => {
+    // remove item from list after deleted
+    this.menus = this.menus.filter(x => x.id !== menu_id);
+    alertStore.success(res.data.message);
+  }).catch((err) => {
+    // remove isDeletes if the deletion fails
+    this.menus.find(x => x.id === menu_id).isDeleting = false;
+    alertStore.error(err.response.data.message);
+  });
 }
 </script>
 
@@ -59,7 +60,7 @@ async function onDelete(menu_id) {
             </tr>
             <tr v-if="menus.error">
                 <td colspan="4">
-                    <div class="text-danger">Error loading menus: {{menus.error}}</div>
+                    <div class="text-danger">Error loading menus: {{menus.error.response.data.message}}</div>
                 </td>
             </tr>            
         </tbody>

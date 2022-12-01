@@ -31,21 +31,30 @@ const schema = Yup.object().shape({
 
 menusStore.create();
 
-async function onSubmit(values) {
-    try {
-        let message;
-        if (menu) {
-            const res = await menusStore.update(menu.value.id, values)
-            message = res.data.message;
-        } else {
-            const res = await menusStore.add(values);
-            message = res.data.message;
-        }
-        await router.push('/menus');
-        alertStore.success(message);
-    } catch (error) {
-        alertStore.error(error);
-    }
+async function onSubmit(values, {setErrors}) {
+  if (menu) {
+    await menusStore.update(menu.value.id, values).then(async (res) => {
+      await router.push('/menus');
+      alertStore.success(res.data.message);
+    }).catch((err) => {
+      if (err.response.data.errors) {
+        setErrors(err.response.data.errors);
+      } else {
+        alertStore.error(err.response.data.message);
+      }
+    });
+  } else {
+    await menusStore.add(values).then(async (res) => {
+      await router.push('/menus');
+      alertStore.success(res.data.message);
+    }).catch((err) => {
+      if (err.response.data.errors) {
+        setErrors(err.response.data.errors);
+      } else {
+        alertStore.error(err.response.data.message);
+      }
+    });
+  }
 }
 </script>
 
@@ -100,7 +109,7 @@ async function onSubmit(values) {
     </template>
     <template v-if="menu?.error">
         <div class="text-center m-5">
-            <div class="text-danger">Error loading menu: {{menu.error}}</div>
+            <div class="text-danger">Error loading menu: {{menu.error.response.data.message}}</div>
         </div>
     </template>
 </template>
